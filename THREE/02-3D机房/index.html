@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="App">
+      <canvas id="canvas"></canvas>
+      <div id="plane">
+        <p>机柜名称：cabinet-001</p>
+        <p>机柜温度：36°</p>
+        <p>使用情况：0/0</p>
+      </div>
+    </div>
+    <script type="module">
+      import MachineRoom from "./MachineRoom.js";
+
+      let canvas = document.querySelector("#canvas");
+      let app = document.querySelector("#App");
+      let plane = document.querySelector("#plane");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let room = new MachineRoom(canvas);
+      room.modelPath = "./models/";
+      room.loadGLTF("machineRoom.gltf");
+      room.animate();
+
+      room.onMouseOverCabinet = (cabinet) => {
+        plane.style.display = "block";
+      };
+      room.onMouseMoveCabinet = (left, top) => {
+       
+        plane.style.top=top+'px';
+        plane.style.left=left+'px';
+      };
+      room.onMouseOutCabinet = () => {
+        plane.style.display = "none";
+      };
+      app.onmousemove = function ({ clientX, clientY }) {
+        room.selectCabinet(clientX, clientY);
+      };
+    </script>
+  </body>
+</html>
