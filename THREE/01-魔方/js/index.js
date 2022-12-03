@@ -2,7 +2,7 @@
  * @Author: h-huan
  * @Date: 2022-11-30 11:39:39
  * @LastEditors: h-huan
- * @LastEditTime: 2022-12-02 17:08:57
+ * @LastEditTime: 2022-12-03 10:55:33
  * @Description: 
  */
 import { Scene, PerspectiveCamera, AmbientLight, Raycaster, AxesHelper, WebGLRenderer, Vector3, Vector2, Texture, MeshLambertMaterial, MeshBasicMaterial, Color, BoxGeometry, Mesh, Quaternion } from '../../jsm/three.module.js'
@@ -94,9 +94,9 @@ class RubikCube {
         this.renderer.domElement.addEventListener('mousemove', this.moveCube.bind(this), false);
         this.renderer.domElement.addEventListener('mouseup', this.stopCube.bind(this), false);
         //监听触摸事件
-        // this.renderer.domElement.addEventListener('touchstart', this.startCube, false);
-        // this.renderer.domElement.addEventListener('touchmove', this.moveCube, false);
-        // this.renderer.domElement.addEventListener('touchend', this.stopCube, false);
+        this.renderer.domElement.addEventListener('touchstart', this.startCube.bind(this), false);
+        this.renderer.domElement.addEventListener('touchmove', this.moveCube.bind(this), false);
+        this.renderer.domElement.addEventListener('touchend', this.stopCube.bind(this), false);
 
         // 模拟一道光源从屏幕点击点上开始，以相机结束位置结束。
         this.raycaster = new Raycaster()
@@ -221,7 +221,7 @@ class RubikCube {
     // 开始操作
     startCube(event) {
         this.getIntersects(event);
-        const { isRotating, intersect } = this
+        let { isRotating, intersect } = this
         // 魔方没有处于转动过程中且存在碰撞物体
         if (!isRotating && intersect) {
             this.startPoint = intersect.point; //开始转动，设置起始点
@@ -235,6 +235,8 @@ class RubikCube {
     stopCube() {
         this.intersect = null;
         this.startPoint = null
+        this.movePoint = null;
+        this.controls.enabled = true
     }
     // 获取转动方向
     getDirection(vector3) {
@@ -327,7 +329,6 @@ class RubikCube {
                 break;
         }
         return direction
-        // this.direction = direction
     }
     // 滑动操作魔方
     moveCube(event) {
@@ -336,6 +337,7 @@ class RubikCube {
             this.getIntersects(event);
             if (!isRotating && startPoint) { //魔方没有进行转动且满足进行转动的条件
                 movePoint = intersect.point;
+                console.log(movePoint.equals(startPoint));
                 if (!movePoint.equals(startPoint)) { //和起始点不一样则意味着可以得到转动向量了
                     this.isRotating = true;//转动标识置为true
                     const sub = movePoint.sub(startPoint);//计算转动向量
@@ -346,7 +348,6 @@ class RubikCube {
                     window.requestAnimationFrame(function (timestamp) {
                         rotateAnimation(elements, direction, timestamp, 0);
                     });
-                    // requestAnimFrame(
                 }
             }
         }
